@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroNime | Neumorphic Developer Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        :root {
+            --bg: #f5f5f5;
+            --nm-flat: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
+            --nm-inset: inset 8px 8px 16px #d1d9e6, inset -8px -8px 16px #ffffff;
+            --nm-flat-sm: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
+            --primary: #10b981;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .nm-flat { box-shadow: var(--nm-flat); }
+        .nm-inset { box-shadow: var(--nm-inset); }
+        .nm-flat-sm { box-shadow: var(--nm-flat-sm); }
+        .tab-active {
+            box-shadow: var(--nm-inset) !important;
+            color: var(--primary) !important;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--nm-inset);
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .loading-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <header class="max-w-7xl mx-auto mb-12">
+        <nav class="nm-flat rounded-[2rem] p-4 flex flex-wrap items-center justify-between gap-6 bg-[#f5f5f5]">
+            <div class="flex items-center gap-3 px-4">
+                <div class="w-10 h-10 nm-inset flex items-center justify-center text-emerald-600 rounded-xl">
+                    <i class="fas fa-bolt text-lg"></i>
+                </div>
+                <span class="font-extrabold text-xl tracking-tighter">RetroNime<span class="text-emerald-600">.dev</span></span>
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide px-2">
+                <button onclick="showTab('recent')" class="nav-tab px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-600 transition-all whitespace-nowrap nm-flat-sm" id="btn-recent">DISCOVER</button>
+                <button onclick="showTab('search')" class="nav-tab px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-600 transition-all whitespace-nowrap nm-flat-sm" id="btn-search">SEARCH</button>
+                <button onclick="showTab('info')" class="nav-tab px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-600 transition-all whitespace-nowrap nm-flat-sm" id="btn-info">METADATA</button>
+                <button onclick="showTab('full-series')" class="nav-tab px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-600 transition-all whitespace-nowrap nm-flat-sm" id="btn-full-series">CLUSTER</button>
+            </div>
+            <div class="px-4">
+                <a href="/" class="nm-flat bg-emerald-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-95 transition-all inline-block">TERMINAL_EXIT</a>
+            </div>
+        </nav>
+    </header>
+    <main class="max-w-6xl mx-auto space-y-16">
+        <section id="recent" class="tab-content space-y-10">
+            <div class="flex items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <h2 class="text-4xl font-extrabold tracking-tighter text-slate-800 uppercase">Global Discover</h2>
+                    <p class="text-slate-400 font-bold text-sm">Real-time edge synchronization across all nodes.</p>
+                </div>
+                <div id="refresh-status" class="nm-inset px-6 py-3 rounded-full text-[9px] font-black text-emerald-600 uppercase tracking-[0.2em]">
+                    SYNCING...
+                </div>
+            </div>
+            <div id="recent-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-10"></div>
+        </section>
+        <section id="search" class="tab-content hidden space-y-12">
+            <div class="max-w-2xl mx-auto text-center space-y-6">
+                <h2 class="text-4xl font-extrabold tracking-tighter uppercase">API Global Index</h2>
+                <div class="nm-inset p-2 rounded-[2rem] flex gap-2 bg-white">
+                    <input type="text" id="search-q" placeholder="Enter series title..."
+                           class="flex-1 bg-transparent border-none px-6 py-4 outline-none font-bold text-slate-700">
+                    <button id="search-btn" onclick="doSearch()" class="nm-flat bg-emerald-600 text-white w-14 h-14 rounded-[1.5rem] flex items-center justify-center active:scale-90 transition-all">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="search-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-10"></div>
+        </section>
+        <section id="info" class="tab-content hidden space-y-12">
+            <div class="max-w-2xl mx-auto space-y-8">
+                <div class="nm-inset p-4 rounded-[2.5rem] space-y-4">
+                   <input type="text" id="info-url" placeholder="/watch/one-piece-1158"
+                          class="w-full nm-flat bg-white border-none rounded-2xl px-6 py-4 outline-none font-bold text-slate-700">
+                   <button id="info-btn" onclick="doInfo()" class="w-full nm-flat bg-slate-800 text-white py-4 rounded-2xl font-black uppercase tracking-widest active:scale-95 transition-all">DEEP_FETCH</button>
+                </div>
+            </div>
+            <div id="info-result"></div>
+        </section>
+        <section id="full-series" class="tab-content hidden space-y-12">
+            <div class="max-w-2xl mx-auto space-y-8">
+                <div class="nm-inset p-4 rounded-[2.5rem] space-y-4">
+                   <input type="text" id="full-series-url" placeholder="/one-piece-dub-episode-1/"
+                          class="w-full nm-flat bg-white border-none rounded-2xl px-6 py-4 outline-none font-bold text-slate-700">
+                   <button id="full-series-btn" onclick="doFullSeries()" class="w-full nm-flat bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest active:scale-95 transition-all">CLUSTER_GENERATE</button>
+                </div>
+            </div>
+            <div id="full-series-result" class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8"></div>
+        </section>
+        <div class="pt-16 border-t border-slate-200">
+            <div class="nm-inset p-4 md:p-6 rounded-[2rem] bg-[#f8f9ff]">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Raw Frame Buffer</span>
+                    <button onclick="copyRawJson()" class="text-[9px] font-black text-emerald-600 uppercase nm-flat-sm px-4 py-2 rounded-lg bg-white active:shadow-nm-inset transition-all">COPY_BUFFER</button>
+                </div>
+                <pre id="raw-json" class="p-6 text-[11px] mono text-emerald-700 whitespace-pre-wrap leading-relaxed overflow-auto max-h-[400px] scrollbar-hide">Awaiting request...</pre>
+            </div>
+        </div>
+    </main>
+    <script>
+        const FALLBACK_IMG = "https://images.unsplash.com/photo-1578632292335-df3abbb0d586?q=80&w=500&auto=format&fit=crop";
+        let currentTab = 'recent';
+        let refreshSec = 30;
+        function showTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('tab-active');
+        }
+        async function api(path, btnId) {
+            const pre = document.getElementById('raw-json');
+            const btn = btnId ? document.getElementById(btnId) : null;
+            const originalContent = btn ? btn.innerHTML : null;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner loading-spin"></i>';
+            }
+            try {
+                const res = await fetch(path);
+                const json = await res.json();
+                pre.textContent = JSON.stringify(json, null, 2);
+                if (!res.ok) return { success: false, error: json.error || 'Server error' };
+                return json;
+            } catch (e) {
+                pre.textContent = `ERROR: ${e.message}`;
+                return { success: false, error: e.message };
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
+            }
+        }
+        async function loadRecent() {
+            const data = await api('/api/scrape/recent');
+            const grid = document.getElementById('recent-grid');
+            if (!data || !data.success || !data.data || !data.data.items) {
+                grid.innerHTML = '<div class="col-span-full py-20 text-center text-slate-400 font-bold">Failed to load recent clusters</div>';
+                return;
+            }
+            grid.innerHTML = data.data.items.map(item => `
+                <div class="nm-flat rounded-[2rem] bg-white overflow-hidden p-3 card-hover transition-all duration-300">
+                    <div class="aspect-[2/3] rounded-[1.5rem] overflow-hidden relative mb-4 bg-slate-100">
+                        <img src="${item.image}" onerror="this.src='${FALLBACK_IMG}'" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 nm-flat-sm bg-emerald-600 text-white text-[9px] font-black px-2 py-1 rounded-full uppercase">${item.episodes || '?'} EP</div>
+                    </div>
+                    <div class="px-2 pb-2">
+                        <h3 class="font-bold text-xs text-slate-700 line-clamp-2 leading-tight">${item.title}</h3>
+                    </div>
+                </div>
+            `).join('');
+        }
+        async function doSearch() {
+            const q = document.getElementById('search-q').value;
+            if (!q) return;
+            const data = await api(`/api/scrape/search?q=${encodeURIComponent(q)}`, 'search-btn');
+            const grid = document.getElementById('search-grid');
+            if (!data || !data.success || !data.data || !data.data.items || data.data.items.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-20 text-center text-slate-400 font-bold uppercase">No matching clusters found</div>';
+                return;
+            }
+            grid.innerHTML = data.data.items.map(item => `
+                <div class="nm-flat rounded-[2rem] bg-white overflow-hidden p-3 card-hover transition-all duration-300">
+                    <div class="aspect-[2/3] rounded-[1.5rem] overflow-hidden mb-4 bg-slate-100">
+                        <img src="${item.image}" onerror="this.src='${FALLBACK_IMG}'" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-bold text-xs text-slate-700 line-clamp-2 px-2 pb-2">${item.title}</h3>
+                </div>
+            `).join('');
+        }
+        async function doInfo() {
+            const url = document.getElementById('info-url').value;
+            if (!url) return;
+            const data = await api(`/api/scrape/info?url=${encodeURIComponent(url)}`, 'info-btn');
+            const resEl = document.getElementById('info-result');
+            if (!data || !data.success || !data.data) {
+                resEl.innerHTML = '<div class="nm-flat rounded-3xl p-10 text-center text-red-500 font-bold">Metadata Fetch Failure</div>';
+                return;
+            }
+            const d = data.data.details;
+            resEl.innerHTML = `
+                <div class="nm-flat rounded-[3rem] bg-white p-6 md:p-10 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+                    <img src="${d.poster}" onerror="this.src='${FALLBACK_IMG}'" class="w-full md:w-72 aspect-[2/3] object-cover rounded-[2rem] nm-flat">
+                    <div class="flex-1 space-y-6 text-center md:text-left">
+                        <h2 class="text-3xl md:text-4xl font-black tracking-tight">${d.title}</h2>
+                        <p class="text-slate-500 font-medium italic leading-relaxed">"${d.description || 'No description available.'}"</p>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+                            <span class="nm-inset px-6 py-2 rounded-full text-[10px] font-black text-emerald-600 uppercase">${d.meta || 'TV SERIES'}</span>
+                            <span class="nm-inset px-6 py-2 rounded-full text-[10px] font-black text-slate-400 uppercase">${d.epCount || '0'} EPS</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        async function doFullSeries() {
+            const url = document.getElementById('full-series-url').value;
+            if (!url) return;
+            const data = await api(`/api/scrape/full-series-eps?ep_url=${encodeURIComponent(url)}`, 'full-series-btn');
+            const resEl = document.getElementById('full-series-result');
+            if (!data || !data.success || !data.data || !data.data.data.eps || data.data.data.eps.length === 0) {
+                resEl.innerHTML = '<div class="col-span-full nm-flat rounded-3xl p-10 text-center text-slate-400 font-bold uppercase">No episode clusters detected</div>';
+                return;
+            }
+            resEl.innerHTML = data.data.data.eps.map(ep => `
+                <div class="nm-flat rounded-3xl bg-white p-6 space-y-6 transition-all hover:translate-y-[-4px]">
+                    <div class="flex items-center justify-between">
+                        <span class="text-3xl font-black text-emerald-600">#${ep.num}</span>
+                        <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">ID_${ep.ep_id}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        ${ep.players.slice(0, 4).map((p, i) => `
+                            <a href="${p}" target="_blank" class="nm-flat-sm py-2 rounded-xl text-[9px] font-black text-center text-slate-500 hover:text-emerald-600 transition-all uppercase">
+                                PLR_${i+1}
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+        async function copyRawJson() {
+            const text = document.getElementById('raw-json').textContent;
+            await navigator.clipboard.writeText(text);
+            alert('Frame buffer copied to clipboard');
+        }
+        showTab('recent');
+        loadRecent();
+        setInterval(() => {
+            refreshSec--;
+            if (refreshSec <= 0) {
+                refreshSec = 30;
+                if (currentTab === 'recent') loadRecent();
+            }
+            document.getElementById('refresh-status').textContent = `NEXT SYNC: ${refreshSec}S`;
+        }, 1000);
+    </script>
+</body>
+</html>

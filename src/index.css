@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 0 0% 96%;
+    --foreground: 215 25% 27%;
+    --primary: 161 94% 30%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 161 94% 30%;
+    --radius: 1rem;
+  }
+  * {
+    @apply border-border;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-color: #f5f5f5;
+  }
+  ::selection {
+    background-color: #10b981;
+    color: #ffffff;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f5f5f5;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d1d9e6;
+    border: 3px solid #f5f5f5;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #b8c1d1;
+  }
+}
+@layer components {
+  .nm-flat {
+    @apply bg-background shadow-nm-flat rounded-[2rem];
+  }
+  .nm-flat-sm {
+    @apply bg-background shadow-nm-flat-sm rounded-xl;
+  }
+  .nm-inset {
+    @apply bg-background shadow-nm-inset rounded-[2rem];
+  }
+  .nm-inset-sm {
+    @apply bg-background shadow-nm-inset-sm rounded-xl;
+  }
+  .nm-button {
+    @apply transition-all active:shadow-nm-inset hover:scale-[0.98] rounded-xl;
+  }
+}
